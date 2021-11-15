@@ -202,7 +202,8 @@ def draw_strip_lines(points: array<float2>; var world_origin_pos: float2; var wo
 [decs(stage=draw)]
 def draw_shape(pos: float2; angle, size:float; shape:string; color:uint)
     let shape_points = find(shapes, shape)
-    draw_strip_lines(deref(shape_points), pos, angle, size, color)
+    if shape_points != null
+        draw_strip_lines(deref(shape_points), pos, angle, size, color)
     return
 
 [decs(stage = draw)]
@@ -409,11 +410,11 @@ def player_pew_pew(pos: float2; angle:float; size: float; var next_time_to_fire:
             next_time_to_fire = time + reload_time
     return
 
-def circle_collision(center0: float2&#; r0: float; center1: float2&#; r1: float&#)
+def circle_collision(center0: float2&; r0: float; center1: float2&; r1: float&)
     let dr = center1-center0
     return length_sq(dr) < pow((r0+r1)*0.8, 2.0)
 
-def on_asteroid_death(eid: EntityId#; pos:float2#)
+def on_asteroid_death(eid: EntityId; pos:float2)
     delete_entity(eid)
 
     spawn_burst(pos, 20, 2.0)
@@ -441,11 +442,11 @@ def on_asteroid_death(eid: EntityId#; pos:float2#)
             score += add_score
     return
 
-def on_bullet_death(eid: EntityId#)
+def on_bullet_death(eid: EntityId)
     delete_entity(eid)
     return
 
-def on_player_death(eid: EntityId#; pos: float2#)
+def on_player_death(eid: EntityId; pos: float2)
     delete_entity(eid)
 
     query() <| $(var player_lifes: int&)
@@ -456,7 +457,7 @@ def on_player_death(eid: EntityId#; pos: float2#)
         cmp |> set("player_respawn_time", get_time_after_start() + PLAYER_RESPAWN_TIME)
     return
 
-def on_bonus_death(eid: EntityId#; pos:float2#)
+def on_bonus_death(eid: EntityId; pos:float2)
     delete_entity(eid)
 
     spawn_burst(pos, 3, 5.0)
@@ -467,7 +468,7 @@ def on_bonus_death(eid: EntityId#; pos:float2#)
                 player_lifes += 1
     return
 
-def on_death(eid: EntityId&#; pos:float2&#; obj_type: ObjectType&#)
+def on_death(eid: EntityId&; pos:float2&; obj_type: ObjectType&)
     if obj_type == ObjectType Asteroid
         on_asteroid_death(eid, pos)
     elif obj_type == ObjectType Bullet
